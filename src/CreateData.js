@@ -16,7 +16,7 @@ function CreateData()
     <select>
       {Data.map(eachData =>
       {
-        return <option>{eachData}</option>
+        return <option>{eachData.modeName}</option>
       })}
     </select>
     <div>Selected Value:</div>
