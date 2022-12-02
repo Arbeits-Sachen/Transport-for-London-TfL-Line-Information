@@ -1,27 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-function CreateData()
+function CreateData(props)
 {
-  const [Data, setData] = useState();
+  const [Transport, setTransport] = useState("");
 
-  useEffect(() =>
+  const change = (event) =>
   {
-      fetch("https://api.tfl.gov.uk/Line/Meta/Modes")
-        .then(response => response.json())
-        .then(data => setData(data))
-  });
+    setTransport(event.target.value);
+  }
+
+  const select = (Transport) =>
+  {
+    if (Transport === "Choose a Mode of Transport...")
+    {
+      setTransport("");
+    }
+  }
 
   return (
-  <div>
-    <select>
-      {Data.map(eachData =>
-      {
-        return <option>{eachData.modeName}</option>
-      })}
-    </select>
-    <div>Selected Value:</div>
-  </div>
+    <div>
+      <select onChange={change}>
+        <option>Choose a Mode of Transport...</option>
+        {props.Data.map(eachData =>
+        {
+          return <option>{eachData.modeName}</option>
+        })}
+      </select>
+      <div onChange={select(Transport)}>Selected Value: {Transport}</div>
+    </div>
   );
 }
-  
+
 export default CreateData;
