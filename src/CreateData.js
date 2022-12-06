@@ -1,8 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function CreateData(props)
 {
   const [Transport, setTransport] = useState("");
+  const [Destination, setDestination] = useState([]);
+
+  useEffect(() =>
+  {
+    if (Transport !== "Choose a Mode of Transport..." && Transport !== "")
+    {
+      fetch("https://api.tfl.gov.uk/Line/Mode/" + Transport)
+        .then(response => response.json())
+        .then(data => setDestination(data))
+    }
+
+    else
+    {
+      setDestination([])
+    }
+
+  }, [Transport]);
+
+
 
   const change = (event) =>
   {
@@ -17,6 +36,10 @@ function CreateData(props)
     }
   }
 
+
+
+
+
   return (
     <div>
       <select onChange={change}>
@@ -26,9 +49,25 @@ function CreateData(props)
           return <option>{eachData.modeName}</option>
         })}
       </select>
+
+      <select>
+        <option>Choose a Destination...</option>
+        <DestinationFunction Destination={Destination} />
+      </select>
+
       <div onChange={select(Transport)}>Selected Value: {Transport}</div>
     </div>
   );
+}
+
+const DestinationFunction = ({ Destination }) =>
+{
+  return (
+    Destination.map(eachDestination =>
+    {
+      return <option>{eachDestination.id}</option>
+    }))
+
 }
 
 export default CreateData;
