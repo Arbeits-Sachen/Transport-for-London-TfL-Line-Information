@@ -114,8 +114,10 @@ const RouteFunction = ({ routeSections }) =>
   {
     return (
       <div>
-        <p>{routeSections[0].originationName}</p>
-        <p>{routeSections[routeSections.length - 1].originationName}</p>
+        <p>Start of the line:</p>
+        <strong>{routeSections[0].originationName}</strong>
+        <p>End of the line:</p>
+        <strong>{routeSections[routeSections.length - 1].originationName}</strong>
       </div>
     )
   }
