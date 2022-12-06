@@ -3,36 +3,67 @@ import { useState, useEffect } from "react";
 function CreateData(props)
 {
   const [Transport, setTransport] = useState("");
-  const [Destination, setDestination] = useState([]);
+  const [selectLine, setSelectLine] = useState("");
+  const [Line, setLine] = useState([]);
+  const [Route, setRoute] = useState({});
 
   useEffect(() =>
   {
-    if (Transport !== "Choose a Mode of Transport..." && Transport !== "")
+    if (Transport !== "")
     {
       fetch("https://api.tfl.gov.uk/Line/Mode/" + Transport)
         .then(response => response.json())
-        .then(data => setDestination(data))
+        .then(data => setLine(data))
     }
 
     else
     {
-      setDestination([])
+      setLine([])
     }
 
   }, [Transport]);
 
 
 
-  const change = (event) =>
+  useEffect(() =>
+  {
+    if (Transport !== "" && selectLine !== "")
+    {
+      fetch("https://api.tfl.gov.uk/Line/" + selectLine + "/Route")
+        .then(response => response.json())
+        .then(data => setRoute(data))
+    }
+
+    else
+    {
+      setRoute({})
+    }
+
+  }, [selectLine, Transport]);
+
+
+
+  const changeTransport = (event) =>
   {
     setTransport(event.target.value);
   }
 
-  const select = (Transport) =>
+  const changeLine = (event) =>
+  {
+    setSelectLine(event.target.value);
+  }
+
+  const select = (Transport, selectLine) =>
   {
     if (Transport === "Choose a Mode of Transport...")
     {
       setTransport("");
+      setSelectLine("");
+    }
+
+    if (selectLine === "Choose a Line...")
+    {
+      setSelectLine("");
     }
   }
 
@@ -42,7 +73,7 @@ function CreateData(props)
 
   return (
     <div>
-      <select onChange={change}>
+      <select onChange={changeTransport}>
         <option>Choose a Mode of Transport...</option>
         {props.Data.map(eachData =>
         {
@@ -50,24 +81,44 @@ function CreateData(props)
         })}
       </select>
 
-      <select>
-        <option>Choose a Destination...</option>
-        <DestinationFunction Destination={Destination} />
+      <select onChange={changeLine}>
+        <option>Choose a Line...</option>
+        <LineFunction Line={Line} />
       </select>
 
-      <div onChange={select(Transport)}>Selected Value: {Transport}</div>
+      <div onChange={select(Transport, selectLine)}>
+        <strong>{Transport}: {selectLine}</strong>
+      </div>
+
+      <RouteFunction routeSections={Route.routeSections} />
     </div>
   );
 }
 
-const DestinationFunction = ({ Destination }) =>
+
+
+const LineFunction = ({ Line }) =>
 {
   return (
-    Destination.map(eachDestination =>
+    Line.map(eachDestination =>
     {
       return <option>{eachDestination.id}</option>
     }))
+}
 
+
+
+const RouteFunction = ({ routeSections }) =>
+{
+  if (routeSections !== "" && routeSections !== undefined)
+  {
+    return (
+      <div>
+        <p>{routeSections[0].originationName}</p>
+        <p>{routeSections[routeSections.length - 1].originationName}</p>
+      </div>
+    )
+  }
 }
 
 export default CreateData;
